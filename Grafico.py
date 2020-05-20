@@ -10,6 +10,7 @@ cls()
 import matplotlib
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.widgets import RectangleSelector
 
 # Import matplotlib and numpy
 import matplotlib.pyplot as plt
@@ -29,6 +30,13 @@ plt.ion()
 # endregion
 
 # %%
+# region: Selection Function
+
+
+
+# endregion
+
+# %%
 # region: MainWindow class
 
 class MainWindow(QMainWindow, Ui_MainWindow):
@@ -44,9 +52,23 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.fig = Figure(figsize=(100,100))
         self.canvas = FigureCanvas(self.fig)
         self.ax = self.fig.subplots()
-
-        # Add a empty line to axis's line list
+        
+        # Create function to be called by 'RectangleSelector' object
+        def OnSelectZoomBox(eclick, erelease):
+            self.ax.set_xlim(eclick.xdata, erelease.xdata)
+            self.ax.set_ylim(eclick.ydata, erelease.ydata)
+            self.get_limits()
+            self.canvas.draw()
+            self.RS.set_active(False)
+        
+        # Create 'RectangleSelector' object to be activated when press on Zoom Rect Buttom
+        self.OnSelectZoomBox = OnSelectZoomBox
+        self.RS = RectangleSelector(self.ax,self.OnSelectZoomBox,useblit=True)
+        self.RS.set_active(False)
+        
+        # Add a empty line to end of axis's line list
         self.ax.plot([],[])
+        self.lines = 1
         
         # Set axis labels
         self.ax.set_xlabel("x axis")
@@ -107,21 +129,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def on_lineEditYsup_returnPressed(self):
         self.set_limits()
     
-    def set_limits(self):
-        
-        # Get values from edit boxes
-        xinf = float(self.lineEditXinf.text())
-        xsup = float(self.lineEditXsup.text())
-        yinf = float(self.lineEditYinf.text())
-        ysup = float(self.lineEditYsup.text())
-        
-        # Set axes limits
-        self.ax.set_xlim(xinf,xsup)
-        self.ax.set_ylim(yinf,ysup)
-        
-        # Redraw figure canvas
-        self.canvas.draw()
-    
     @QtCore.pyqtSlot()
     def on_pushButtonHome_clicked(self):
         
@@ -137,17 +144,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # Redraw figure canvas
         self.canvas.draw()
         
-        # Get axes limits and put on lineEdits
-        self.lineEditXinf.setText("{:0.2f}".format(self.ax.get_xlim()[0]))
-        self.lineEditXsup.setText("{:0.2f}".format(self.ax.get_xlim()[1]))
-        self.lineEditYinf.setText("{:0.2f}".format(self.ax.get_ylim()[0]))
-        self.lineEditYsup.setText("{:0.2f}".format(self.ax.get_ylim()[1]))
+        self.get_limits()
     
     @QtCore.pyqtSlot()
     def on_pushButtonAddPlot_clicked(self):
         
         # Add a new line plot to lines list
         self.ax.plot([],[])
+        self.lines += 1
         
         # Set focus on edit box of equation
         self.lineEditEq.setText("")
@@ -156,16 +160,44 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     @QtCore.pyqtSlot()
     def on_pushButtonDelPlot_clicked(self):
         
-        if len(self.ax.lines)>1:
+        if self.lines>0:
             
             # Remove last line
             self.ax.lines.pop()
             
             # Redraw figure canvas
             self.canvas.draw()
-
-
-
+            
+            # Decrease number of curves
+            self.lines -= 1
+    
+    @QtCore.pyqtSlot()
+    def on_pushButtonRect_clicked(self):
+        self.RS.set_active(True)
+    
+    def set_limits(self):
+        
+        # Get values from edit boxes
+        xinf = float(self.lineEditXinf.text())
+        xsup = float(self.lineEditXsup.text())
+        yinf = float(self.lineEditYinf.text())
+        ysup = float(self.lineEditYsup.text())
+        
+        # Set axes limits
+        self.ax.set_xlim(xinf,xsup)
+        self.ax.set_ylim(yinf,ysup)
+        
+        # Redraw figure canvas
+        self.canvas.draw()
+    
+    def get_limits(self):
+        
+        # Get axes limits and put on lineEdits
+        self.lineEditXinf.setText("{:0.2f}".format(self.ax.get_xlim()[0]))
+        self.lineEditXsup.setText("{:0.2f}".format(self.ax.get_xlim()[1]))
+        self.lineEditYinf.setText("{:0.2f}".format(self.ax.get_ylim()[0]))
+        self.lineEditYsup.setText("{:0.2f}".format(self.ax.get_ylim()[1]))
+    
 # endregion
 
 # %%
@@ -177,6 +209,7 @@ print("matplotlib is embeded in PyQt with Figure's canvas in widget")
 
 app = QApplication([])
 janela = MainWindow()
+# janela.show() # 
 janela.showMaximized()
 janela.move(600,300)
 janela.resize(750,500)
