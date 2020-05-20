@@ -44,7 +44,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.fig = Figure(figsize=(100,100))
         self.canvas = FigureCanvas(self.fig)
         self.ax = self.fig.subplots()
-        self.lines = self.ax.plot([],[])
+
+        # Add a empty line to axis's line list
+        self.ax.plot([],[])
         
         # Set axis labels
         self.ax.set_xlabel("x axis")
@@ -59,7 +61,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # Configure home axes limits
         self.on_pushButtonHome_clicked()
     
-    # @QtCore.pyqtSlot()
+    @QtCore.pyqtSlot()
     def on_lineEditEq_returnPressed(self):
         
         # Get data from edit boxes
@@ -72,36 +74,36 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         y = eval(self.lineEditEq.text())
         
         # Set new data to the curve
-        self.lines[-1].set_data(x,y)
+        self.ax.lines[-1].set_data(x,y)
         
         # Redraw figure canvas
         self.canvas.draw()        
     
-    # @QtCore.pyqtSlot()
+    @QtCore.pyqtSlot()
     def on_lineEditStart_returnPressed(self):
         self.on_lineEditEq_returnPressed()
     
-    # @QtCore.pyqtSlot()
+    @QtCore.pyqtSlot()
     def on_lineEditStop_returnPressed(self):
         self.on_lineEditEq_returnPressed()
     
-    # @QtCore.pyqtSlot()
+    @QtCore.pyqtSlot()
     def on_lineEditNum_returnPressed(self):
         self.on_lineEditEq_returnPressed()
     
-    # @QtCore.pyqtSlot()
+    @QtCore.pyqtSlot()
     def on_lineEditXinf_returnPressed(self):
         self.set_limits()
     
-    # @QtCore.pyqtSlot()
+    @QtCore.pyqtSlot()
     def on_lineEditXsup_returnPressed(self):
         self.set_limits()
     
-    # @QtCore.pyqtSlot()
+    @QtCore.pyqtSlot()
     def on_lineEditYinf_returnPressed(self):
         self.set_limits()
     
-    # @QtCore.pyqtSlot()
+    @QtCore.pyqtSlot()
     def on_lineEditYsup_returnPressed(self):
         self.set_limits()
     
@@ -120,7 +122,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # Redraw figure canvas
         self.canvas.draw()
     
-    # @QtCore.pyqtSlot()
+    @QtCore.pyqtSlot()
     def on_pushButtonHome_clicked(self):
         
         # Reset auto-scale
@@ -144,11 +146,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     @QtCore.pyqtSlot()
     def on_pushButtonAddPlot_clicked(self):
         
-        # Creat a new line plot and unpack the list to temp variable
-        temp_line, = self.ax.plot([],[])
-        
         # Add a new line plot to lines list
-        self.lines.append(temp_line)
+        self.ax.plot([],[])
         
         # Set focus on edit box of equation
         self.lineEditEq.setText("")
@@ -157,11 +156,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     @QtCore.pyqtSlot()
     def on_pushButtonDelPlot_clicked(self):
         
-        if len(self.lines)>1:
+        if len(self.ax.lines)>1:
             
             # Remove last line
             self.ax.lines.pop()
-            self.lines.pop()
             
             # Redraw figure canvas
             self.canvas.draw()
@@ -173,9 +171,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 # %%
 # region: Main Program
 
+print("*** PROGRAM TO PLOT SIMPLE GRAPH WITH MATPLOTLIB AND PYQT ***")
+print("")
+print("matplotlib is embeded in PyQt with Figure's canvas in widget")
+
 app = QApplication([])
 janela = MainWindow()
-janela.show()
+janela.showMaximized()
+janela.move(600,300)
+janela.resize(750,500)
 sys.exit(app.exec_())
 
 # endregion
