@@ -48,40 +48,118 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # Configure window layout in Ui_MainWindow
         self.setupUi(self)
         
-        # Initiate figure, canvas, axe and lines
+        # Initiate figure, canvas and axes
         self.fig = Figure(figsize=(100,100))
         self.canvas = FigureCanvas(self.fig)
         self.ax = self.fig.subplots()
         
-        # Create function to be called by 'RectangleSelector' object
-        def OnSelectZoomBox(eclick, erelease):
-            self.ax.set_xlim(eclick.xdata, erelease.xdata)
-            self.ax.set_ylim(eclick.ydata, erelease.ydata)
-            self.get_limits()
-            self.canvas.draw()
-            self.RS.set_active(False)
+        # Connect event with string *button_press_event* to *on_mouse_press* function
+        # https://matplotlib.org/api/backend_bases_api.html?highlight=mpl_connect#matplotlib.backend_bases.FigureCanvasBase.mpl_connect
+        self.canvas.mpl_connect('button_press_event',self.on_mouse_press)
         
         # Create 'RectangleSelector' object to be activated when press on Zoom Rect Buttom
-        self.OnSelectZoomBox = OnSelectZoomBox
-        self.RS = RectangleSelector(self.ax,self.OnSelectZoomBox,useblit=True)
-        self.RS.set_active(False)
+        # REMARK: This functions creates a set of polylines in the axes
+        # https://matplotlib.org/api/widgets_api.html?highlight=rectangleselector#matplotlib.widgets.RectangleSelector
+        self.RS = RectangleSelector(self.ax,self.on_select_zoom_box,useblit=True)
+        self.RS.set_active(False) # deactivate the selector
         
-        # Add a empty line to end of axis's line list
+        # Add Figure Canvas to PyQt Widget
+        # REMARK: It is HERE where the matplotlib canvas is conected to PyQt layout (lacking of official documentation)
+        # https://www.riverbankcomputing.com/static/Docs/PyQt5/api/qtwidgets/qboxlayout.html?highlight=addwidget 
+        self.verticalLayout.addWidget(self.canvas)
+        
+        # Add a empty line to end of axis's line list (RectangleSelector already created some)
         self.ax.plot([],[])
-        self.lines = 1
+        self.lines = 1 # Number of real plot lines
         
         # Set axis labels
         self.ax.set_xlabel("x axis")
         self.ax.set_ylabel("y axis")
         
-        # Add Figure Canvas to PyQt Widget
-        self.verticalLayout.addWidget(self.canvas)
-        
-        # Plot current equation
+        # Plot current equation (method already conected to signal 'returnPressed' of 'lineEditEq', defined bellow)
         self.on_lineEditEq_returnPressed()
         
-        # Configure home axes limits
+        # Configure home axes limits (method already conected to signal 'clicked' of 'pushButtonHome', defined bellow)
         self.on_pushButtonHome_clicked()
+    
+    # Function to be called when clicking on canvas
+    def on_mouse_press(self, event: matplotlib.backend_bases.MouseEvent):
+        """ Function that is called when click with mouse on FIGURE CANVAS (not only inside axes)
+            This Functions only prints information on the terminal
+        
+        Arguments:
+            event {matplotlib.backend_bases.MouseEvent} -- 
+            
+            For the location events (button and key press/release), if the mouse is over the axes, 
+            the inaxes attribute of the event will be set to the Axes the event occurs is over, and additionally, 
+            the variables xdata and ydata attributes will be set to the mouse location in data coordinates. 
+            See KeyEvent and MouseEvent for more info.
+            https://matplotlib.org/api/backend_bases_api.html?highlight=mpl_connect#matplotlib.backend_bases.KeyEvent
+            https://matplotlib.org/api/backend_bases_api.html?highlight=mpl_connect#matplotlib.backend_bases.MouseEvent
+        
+        """
+        # Clears terminal
+        cls()
+        
+        # If the mouse is over an axes
+        if event.inaxes:
+            
+            # Print polylines ploted in axes
+            print("Polylines objects: =================")
+            for line in event.inaxes.lines:
+                print(line)
+            
+            # Print coordinates to mouse position
+            print("\nPosition :==============")
+            print("x = ",event.xdata," | y = ",event.ydata)
+        else:
+            # If the mouse is not over an axes
+            print("Clicked out of axes")
+    
+    # Function to be called by 'RectangleSelector' object
+    def on_select_zoom_box(self, eclick: matplotlib.backend_bases.MouseEvent, erelease: matplotlib.backend_bases.MouseEvent):
+        """Function that is called by "RectangleSelector" object from "matplotlib.widgets"
+
+        Arguments:
+            eclick {matplotlib.backend_bases.MouseEvent} -- matplotlib event at press mouse button
+            erelease {matplotlib.backend_bases.MouseEvent} -- matplotlib event at release mouse button
+            https://matplotlib.org/api/backend_bases_api.html?highlight=matplotlib%20backend_bases%20mouseevent#matplotlib.backend_bases.MouseEvent
+        """                
+        self.ax.set_xlim(eclick.xdata, erelease.xdata)
+        self.ax.set_ylim(eclick.ydata, erelease.ydata)
+        self.get_limits()
+        self.canvas.draw()
+        self.RS.set_active(False)
+    
+    # Get values from lineEdits and set axes limits to they
+    def set_limits(self):
+        
+        """Function to get values from 'lineEdits' boxes and set limits of axes"""
+        
+        # Get values from edit boxes
+        xinf = float(self.lineEditXinf.text())
+        xsup = float(self.lineEditXsup.text())
+        yinf = float(self.lineEditYinf.text())
+        ysup = float(self.lineEditYsup.text())
+        
+        # Set axes limits
+        self.ax.set_xlim(xinf,xsup)
+        self.ax.set_ylim(yinf,ysup)
+        
+        # Redraw figure canvas
+        self.canvas.draw()
+        
+        self.get_limits()
+    
+    # Get axes limits and put on lineEdits
+    def get_limits(self):
+        
+        """Function to get the actual limits of axes and put it on 'lineEdits' """
+        
+        self.lineEditXinf.setText("{:0.2f}".format(self.ax.get_xlim()[0]))
+        self.lineEditXsup.setText("{:0.2f}".format(self.ax.get_xlim()[1]))
+        self.lineEditYinf.setText("{:0.2f}".format(self.ax.get_ylim()[0]))
+        self.lineEditYsup.setText("{:0.2f}".format(self.ax.get_ylim()[1]))
     
     @QtCore.pyqtSlot()
     def on_lineEditEq_returnPressed(self):
@@ -149,9 +227,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     @QtCore.pyqtSlot()
     def on_pushButtonAddPlot_clicked(self):
         
-        # Add a new line plot to lines list
-        self.ax.plot([],[])
-        self.lines += 1
+        if len(self.ax.lines[-1].get_xdata()) > 0:
+            # Add a new line plot to lines list, if the last wasn't empty
+            self.ax.plot([],[])
+            self.lines += 1
         
         # Set focus on edit box of equation
         self.lineEditEq.setText("")
@@ -175,29 +254,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def on_pushButtonRect_clicked(self):
         self.RS.set_active(True)
     
-    def set_limits(self):
-        
-        # Get values from edit boxes
-        xinf = float(self.lineEditXinf.text())
-        xsup = float(self.lineEditXsup.text())
-        yinf = float(self.lineEditYinf.text())
-        ysup = float(self.lineEditYsup.text())
-        
-        # Set axes limits
-        self.ax.set_xlim(xinf,xsup)
-        self.ax.set_ylim(yinf,ysup)
-        
-        # Redraw figure canvas
-        self.canvas.draw()
-    
-    def get_limits(self):
-        
-        # Get axes limits and put on lineEdits
-        self.lineEditXinf.setText("{:0.2f}".format(self.ax.get_xlim()[0]))
-        self.lineEditXsup.setText("{:0.2f}".format(self.ax.get_xlim()[1]))
-        self.lineEditYinf.setText("{:0.2f}".format(self.ax.get_ylim()[0]))
-        self.lineEditYsup.setText("{:0.2f}".format(self.ax.get_ylim()[1]))
-    
 # endregion
 
 # %%
@@ -209,10 +265,10 @@ print("matplotlib is embeded in PyQt with Figure's canvas in widget")
 
 app = QApplication([])
 janela = MainWindow()
-# janela.show() # 
-janela.showMaximized()
-janela.move(600,300)
-janela.resize(750,500)
+janela.show() # 
+# janela.showMaximized()
+# janela.move(600,300)
+# janela.resize(750,500)
 sys.exit(app.exec_())
 
 # endregion
