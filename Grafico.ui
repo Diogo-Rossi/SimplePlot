@@ -132,7 +132,8 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Zoom Hor</string>
+         <string>Zoom Hor
+←→</string>
         </property>
        </widget>
       </item>
@@ -145,7 +146,8 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Zoom Vert</string>
+         <string>Zoom Vert
+↕</string>
         </property>
        </widget>
       </item>
@@ -158,7 +160,8 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Add New Plot</string>
+         <string>Add New Plot
+(+)</string>
         </property>
        </widget>
       </item>
@@ -171,7 +174,8 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Zoom Rect</string>
+         <string>Zoom Rect
+█</string>
         </property>
        </widget>
       </item>
@@ -184,7 +188,8 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Zoom Home</string>
+         <string>Zoom Home
+⌂</string>
         </property>
        </widget>
       </item>
@@ -197,7 +202,8 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Del Last Plot</string>
+         <string>Del Last Plot
+(-)</string>
         </property>
        </widget>
       </item>
@@ -358,7 +364,7 @@
        </widget>
       </item>
       <item row="0" column="10" rowspan="3">
-       <widget class="QPushButton" name="pushButtonSelPts">
+       <widget class="QPushButton" name="pushButtonPlayMovie">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
           <horstretch>0</horstretch>
@@ -366,7 +372,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Select points 
+         <string>Play Movie 
  in last plot</string>
         </property>
        </widget>
@@ -486,7 +492,7 @@
   <tabstop>pushButtonVert</tabstop>
   <tabstop>pushButtonHor</tabstop>
   <tabstop>pushButtonHome</tabstop>
-  <tabstop>pushButtonSelPts</tabstop>
+  <tabstop>pushButtonPlayMovie</tabstop>
  </tabstops>
  <resources/>
  <connections/>

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'c:\0\Repos\SimplePlotTool\Grafico.ui'
+# Form implementation generated from reading ui file 'c:\0\Repos\SimplePlot\Grafico.ui'
 #
 # Created by: PyQt5 UI code generator 5.9.2
 #
@@ -178,14 +178,14 @@ class Ui_MainWindow(object):
         self.lineEditStart.setFont(font)
         self.lineEditStart.setObjectName("lineEditStart")
         self.gridLayout.addWidget(self.lineEditStart, 0, 5, 1, 1)
-        self.pushButtonSelPts = QtWidgets.QPushButton(self.centralwidget)
+        self.pushButtonPlayMovie = QtWidgets.QPushButton(self.centralwidget)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.pushButtonSelPts.sizePolicy().hasHeightForWidth())
-        self.pushButtonSelPts.setSizePolicy(sizePolicy)
-        self.pushButtonSelPts.setObjectName("pushButtonSelPts")
-        self.gridLayout.addWidget(self.pushButtonSelPts, 0, 10, 3, 1)
+        sizePolicy.setHeightForWidth(self.pushButtonPlayMovie.sizePolicy().hasHeightForWidth())
+        self.pushButtonPlayMovie.setSizePolicy(sizePolicy)
+        self.pushButtonPlayMovie.setObjectName("pushButtonPlayMovie")
+        self.gridLayout.addWidget(self.pushButtonPlayMovie, 0, 10, 3, 1)
         self.label_2 = QtWidgets.QLabel(self.centralwidget)
         self.label_2.setAlignment(QtCore.Qt.AlignCenter)
         self.label_2.setObjectName("label_2")
@@ -247,17 +247,23 @@ class Ui_MainWindow(object):
         MainWindow.setTabOrder(self.pushButtonRect, self.pushButtonVert)
         MainWindow.setTabOrder(self.pushButtonVert, self.pushButtonHor)
         MainWindow.setTabOrder(self.pushButtonHor, self.pushButtonHome)
-        MainWindow.setTabOrder(self.pushButtonHome, self.pushButtonSelPts)
+        MainWindow.setTabOrder(self.pushButtonHome, self.pushButtonPlayMovie)
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "Simple Plot Tool with Python"))
-        self.pushButtonHor.setText(_translate("MainWindow", "Zoom Hor"))
-        self.pushButtonVert.setText(_translate("MainWindow", "Zoom Vert"))
-        self.pushButtonAddPlot.setText(_translate("MainWindow", "Add New Plot"))
-        self.pushButtonRect.setText(_translate("MainWindow", "Zoom Rect"))
-        self.pushButtonHome.setText(_translate("MainWindow", "Zoom Home"))
-        self.pushButtonDelPlot.setText(_translate("MainWindow", "Del Last Plot"))
+        self.pushButtonHor.setText(_translate("MainWindow", "Zoom Hor\n"
+"←→"))
+        self.pushButtonVert.setText(_translate("MainWindow", "Zoom Vert\n"
+"↕"))
+        self.pushButtonAddPlot.setText(_translate("MainWindow", "Add New Plot\n"
+"(+)"))
+        self.pushButtonRect.setText(_translate("MainWindow", "Zoom Rect\n"
+"█"))
+        self.pushButtonHome.setText(_translate("MainWindow", "Zoom Home\n"
+"⌂"))
+        self.pushButtonDelPlot.setText(_translate("MainWindow", "Del Last Plot\n"
+"(-)"))
         self.lineEditYinf.setText(_translate("MainWindow", "-1"))
         self.lineEditYinf.setPlaceholderText(_translate("MainWindow", "x inf"))
         self.label_5.setText(_translate("MainWindow", "x sup"))
@@ -273,7 +279,7 @@ class Ui_MainWindow(object):
         self.lineEditNum.setPlaceholderText(_translate("MainWindow", "Num of pts"))
         self.lineEditStart.setText(_translate("MainWindow", "0"))
         self.lineEditStart.setPlaceholderText(_translate("MainWindow", "Start point"))
-        self.pushButtonSelPts.setText(_translate("MainWindow", "Select points \n"
+        self.pushButtonPlayMovie.setText(_translate("MainWindow", "Play Movie \n"
 " in last plot"))
         self.label_2.setText(_translate("MainWindow", "y inf"))
         self.lineEditXsup.setText(_translate("MainWindow", "7"))

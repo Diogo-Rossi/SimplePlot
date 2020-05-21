@@ -3,8 +3,8 @@
 
 # Import System tools
 import sys, os, pdb
-def cls(): os.system("cls")
-cls()
+def clc(): os.system("cls")
+clc()
 
 # Import matplotlib
 import matplotlib
@@ -49,6 +49,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # Connect event with string *button_press_event* to *on_mouse_press* function
         # https://matplotlib.org/api/backend_bases_api.html?highlight=mpl_connect#matplotlib.backend_bases.FigureCanvasBase.mpl_connect
         self.canvas.mpl_connect('button_press_event',self.on_mouse_press)
+        self.canvas.mpl_connect('motion_notify_event',self.on_move_mouse)
         
         # Create 'RectangleSelector' object to be activated when press on Zoom Rect Buttom
         # REMARK: This functions creates a set of polylines in the axes
@@ -82,6 +83,19 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # Configure home axes limits (method already conected to signal 'clicked' of 'pushButtonHome', defined bellow)
         self.on_pushButtonHome_clicked()
     
+    def on_move_mouse(self,event):
+        
+        # Clears terminal
+        clc()
+        
+        if event.inaxes:
+            # Print coordinates to mouse position
+            print("\nPosition :==============")
+            print("x = ",event.xdata," | y = ",event.ydata)
+        else:
+            # If the mouse is not over an axes
+            print("Clicked out of axes")
+    
     # Function to be called when clicking on canvas
     def on_mouse_press(self, event: matplotlib.backend_bases.MouseEvent):
         """ Function that is called when click with mouse on FIGURE CANVAS (not only inside axes)
@@ -99,7 +113,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         
         """
         # Clears terminal
-        cls()
+        clc()
         
         # If the mouse is over an axes
         if event.inaxes:
@@ -249,11 +263,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     @QtCore.pyqtSlot()
     def on_pushButtonAddPlot_clicked(self):
         
-        if len(self.ax.lines[-1].get_xdata()) > 0:
-            # Add a new line plot to lines list, if the last wasn't empty
+        # Add a new line-plot to lines list, if the last wasn't empty
+        # or if there is no lines
+        if self.lines <=0 or len(self.ax.lines[-1].get_xdata()) > 0:
             self.ax.plot([],[])
             self.lines += 1
-        
+            
         # Set focus on edit box of equation
         self.lineEditEq.setText("")
         self.lineEditEq.setFocus()
