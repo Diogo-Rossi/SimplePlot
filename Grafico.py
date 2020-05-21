@@ -10,7 +10,7 @@ cls()
 import matplotlib
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
-from matplotlib.widgets import RectangleSelector
+from matplotlib.widgets import RectangleSelector, SpanSelector
 
 # Import matplotlib and numpy
 import matplotlib.pyplot as plt
@@ -26,13 +26,6 @@ from Ui_Grafico import Ui_MainWindow
 # Configure matplotlib's backend and pyplot's interactive mode
 matplotlib.use("Qt5Agg")
 plt.ion()
-
-# endregion
-
-# %%
-# region: Selection Function
-
-
 
 # endregion
 
@@ -62,6 +55,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # https://matplotlib.org/api/widgets_api.html?highlight=rectangleselector#matplotlib.widgets.RectangleSelector
         self.RS = RectangleSelector(self.ax,self.on_select_zoom_box,useblit=True)
         self.RS.set_active(False) # deactivate the selector
+        
+        # Create 'SpanSelector' object in vertical and horizontal directions, to be activated with zoom vert and hor
+        # https://matplotlib.org/api/widgets_api.html?highlight=spanselector#matplotlib.widgets.SpanSelector
+        self.SSv = SpanSelector(self.ax,self.on_vert_zoom,'vertical',useblit=True)
+        self.SSh = SpanSelector(self.ax,self.on_hor_zoom,'horizontal',useblit=True)
+        self.SSv.set_active(False)
+        self.SSh.set_active(False)
         
         # Add Figure Canvas to PyQt Widget
         # REMARK: It is HERE where the matplotlib canvas is conected to PyQt layout (lacking of official documentation)
@@ -130,6 +130,28 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.get_limits()
         self.canvas.draw()
         self.RS.set_active(False)
+    
+    # Functions to be called when "zoom" vertical and horizontal directions
+    def on_vert_zoom(self,vmin:float,vmax:float):
+        """Function to zoom only in vertical direction that is called by de SpanSelector object with direction="vertical"
+        
+        Arguments:
+            vmin {float} -- min range value
+            vmax {float} -- max range value
+        """   
+        self.ax.set_ylim(vmin, vmax)
+        self.get_limits()
+        self.SSv.set_active(False)
+    def on_hor_zoom(self,hmin:float,hmax:float):
+        """Function to zoom only in horizontal direction that is called by de SpanSelector object with direction="horizontal"
+        
+        Arguments:
+            hmin {float} -- min range value
+            hmax {float} -- max range value
+        """   
+        self.ax.set_xlim(hmin, hmax)
+        self.get_limits()
+        self.SSh.set_active(False)
     
     # Get values from lineEdits and set axes limits to they
     def set_limits(self):
@@ -254,6 +276,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def on_pushButtonRect_clicked(self):
         self.RS.set_active(True)
     
+    @QtCore.pyqtSlot()
+    def on_pushButtonHor_clicked(self):
+        self.SSh.set_active(True)
+    
+    @QtCore.pyqtSlot()
+    def on_pushButtonVert_clicked(self):
+        self.SSv.set_active(True)
+
+
 # endregion
 
 # %%
