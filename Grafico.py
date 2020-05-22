@@ -10,7 +10,7 @@ clc()
 import matplotlib
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
-from matplotlib.widgets import RectangleSelector, SpanSelector
+from matplotlib.widgets import RectangleSelector, SpanSelector, MultiCursor
 
 # Import matplotlib and numpy
 import matplotlib.pyplot as plt
@@ -64,6 +64,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.SSv.set_active(False)
         self.SSh.set_active(False)
         
+        # Create 'Multicursor' object in vertical and horizontal directions
+        # https://matplotlib.org/api/widgets_api.html#matplotlib.widgets.MultiCursor 
+        self.MCv = MultiCursor(self.canvas,(self.ax,),useblit=False,horizOn=False, vertOn=True)
+        self.MCh = MultiCursor(self.canvas,(self.ax,),useblit=False,horizOn=True, vertOn=False)
+        self.MCv.set_active(True)
+        self.MCh.set_active(True)
+        
         # Add Figure Canvas to PyQt Widget
         # REMARK: It is HERE where the matplotlib canvas is conected to PyQt layout (lacking of official documentation)
         # https://www.riverbankcomputing.com/static/Docs/PyQt5/api/qtwidgets/qboxlayout.html?highlight=addwidget 
@@ -92,6 +99,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             # Print coordinates to mouse position
             print("\nPosition :==============")
             print("x = ",event.xdata," | y = ",event.ydata)
+            print(self.MCh.active)
+            print(self.MCv.active)
+        
         else:
             # If the mouse is not over an axes
             print("Clicked out of axes")
@@ -126,6 +136,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             # Print coordinates to mouse position
             print("\nPosition :==============")
             print("x = ",event.xdata," | y = ",event.ydata)
+            self.canvas.draw()
         else:
             # If the mouse is not over an axes
             print("Clicked out of axes")
@@ -138,7 +149,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             eclick {matplotlib.backend_bases.MouseEvent} -- matplotlib event at press mouse button
             erelease {matplotlib.backend_bases.MouseEvent} -- matplotlib event at release mouse button
             https://matplotlib.org/api/backend_bases_api.html?highlight=matplotlib%20backend_bases%20mouseevent#matplotlib.backend_bases.MouseEvent
-        """                
+        """
+        self.MCv.set_active(True)
+        self.MCh.set_active(True)
         self.ax.set_xlim(eclick.xdata, erelease.xdata)
         self.ax.set_ylim(eclick.ydata, erelease.ydata)
         self.get_limits()
@@ -153,9 +166,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             vmin {float} -- min range value
             vmax {float} -- max range value
         """   
+        self.MCv.set_active(True)
+        self.MCh.set_active(True)
         self.ax.set_ylim(vmin, vmax)
         self.get_limits()
         self.SSv.set_active(False)
+
     def on_hor_zoom(self,hmin:float,hmax:float):
         """Function to zoom only in horizontal direction that is called by de SpanSelector object with direction="horizontal"
         
@@ -163,6 +179,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             hmin {float} -- min range value
             hmax {float} -- max range value
         """   
+        self.MCv.set_active(True)
+        self.MCh.set_active(True)
         self.ax.set_xlim(hmin, hmax)
         self.get_limits()
         self.SSh.set_active(False)
@@ -289,16 +307,30 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     
     @QtCore.pyqtSlot()
     def on_pushButtonRect_clicked(self):
+        self.MCv.set_active(False)
+        self.MCh.set_active(False)
+        self.SSv.set_active(False)
+        self.SSh.set_active(False)        
         self.RS.set_active(True)
+        self.canvas.draw()
     
     @QtCore.pyqtSlot()
     def on_pushButtonHor_clicked(self):
+        self.MCv.set_active(False)
+        self.MCh.set_active(False)
+        self.RS.set_active(False)
+        self.SSv.set_active(False)
         self.SSh.set_active(True)
+        self.canvas.draw()
     
     @QtCore.pyqtSlot()
     def on_pushButtonVert_clicked(self):
+        self.MCv.set_active(False)
+        self.MCh.set_active(False)
+        self.RS.set_active(False)
+        self.SSh.set_active(False)
         self.SSv.set_active(True)
-
+        self.canvas.draw()
 
 # endregion
 
