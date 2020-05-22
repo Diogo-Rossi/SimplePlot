@@ -1,6 +1,9 @@
 # %%
 # region: Imports
 
+# Time import
+from time import time
+
 # Import System tools
 import sys, os, pdb
 def clc(): os.system("cls")
@@ -46,6 +49,16 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.canvas = FigureCanvas(self.fig)
         self.ax = self.fig.subplots()
         
+        # Define axes lines
+        self.ax.axhline(linewidth=1,linestyle="dashdot",color="#6E6E6E")
+        self.ax.axvline(linewidth=1,linestyle="dashdot",color="#6E6E6E")
+        
+        # Set plot title
+        self.ax.set_title("Simple plot tool built with Python")    
+        
+        # Local dictionary
+        rectprops = dict(facecolor='gray', alpha=0.5)
+        
         # Connect event with string *button_press_event* to *on_mouse_press* function
         # https://matplotlib.org/api/backend_bases_api.html?highlight=mpl_connect#matplotlib.backend_bases.FigureCanvasBase.mpl_connect
         self.canvas.mpl_connect('button_press_event',self.on_mouse_press)
@@ -54,22 +67,23 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # Create 'RectangleSelector' object to be activated when press on Zoom Rect Buttom
         # REMARK: This functions creates a set of polylines in the axes
         # https://matplotlib.org/api/widgets_api.html?highlight=rectangleselector#matplotlib.widgets.RectangleSelector
-        self.RS = RectangleSelector(self.ax,self.on_select_zoom_box,useblit=True)
+        # https://matplotlib.org/gallery/widgets/rectangle_selector.html?highlight=rectangleselector 
+        self.RS = RectangleSelector(self.ax,self.on_select_zoom_box,useblit=True,rectprops=rectprops)
         self.RS.set_active(False) # deactivate the selector
         
         # Create 'SpanSelector' object in vertical and horizontal directions, to be activated with zoom vert and hor
         # https://matplotlib.org/api/widgets_api.html?highlight=spanselector#matplotlib.widgets.SpanSelector
-        self.SSv = SpanSelector(self.ax,self.on_vert_zoom,'vertical',useblit=True)
-        self.SSh = SpanSelector(self.ax,self.on_hor_zoom,'horizontal',useblit=True)
+        # https://matplotlib.org/gallery/widgets/span_selector.html?highlight=spanselector 
+        self.SSv = SpanSelector(self.ax,self.on_vert_zoom,'vertical',useblit=True,rectprops=rectprops)
+        self.SSh = SpanSelector(self.ax,self.on_hor_zoom,'horizontal',useblit=True,rectprops=rectprops)
         self.SSv.set_active(False)
         self.SSh.set_active(False)
         
         # Create 'Multicursor' object in vertical and horizontal directions
-        # https://matplotlib.org/api/widgets_api.html#matplotlib.widgets.MultiCursor 
-        self.MCv = MultiCursor(self.canvas,(self.ax,),useblit=False,horizOn=False, vertOn=True)
-        self.MCh = MultiCursor(self.canvas,(self.ax,),useblit=False,horizOn=True, vertOn=False)
-        self.MCv.set_active(True)
-        self.MCh.set_active(True)
+        # https://matplotlib.org/api/widgets_api.html#matplotlib.widgets.MultiCursor
+        # https://matplotlib.org/gallery/widgets/multicursor.html?highlight=multicursor 
+        self.MC = MultiCursor(self.canvas,(self.ax,),useblit=True,horizOn=True, vertOn=True,linewidth=1,color="#C8C8C8")
+        self.MC.set_active(True)
         
         # Add Figure Canvas to PyQt Widget
         # REMARK: It is HERE where the matplotlib canvas is conected to PyQt layout (lacking of official documentation)
@@ -99,8 +113,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             # Print coordinates to mouse position
             print("\nPosition :==============")
             print("x = ",event.xdata," | y = ",event.ydata)
-            print(self.MCh.active)
-            print(self.MCv.active)
+            print("MultiCursor active? ", self.MC.active)
         
         else:
             # If the mouse is not over an axes
@@ -130,8 +143,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             
             # Print polylines ploted in axes
             print("Polylines objects: =================")
+            i = 0
             for line in event.inaxes.lines:
-                print(line)
+                print("line [",i,"]: ",line)
+                i += 1
             
             # Print coordinates to mouse position
             print("\nPosition :==============")
@@ -150,8 +165,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             erelease {matplotlib.backend_bases.MouseEvent} -- matplotlib event at release mouse button
             https://matplotlib.org/api/backend_bases_api.html?highlight=matplotlib%20backend_bases%20mouseevent#matplotlib.backend_bases.MouseEvent
         """
-        self.MCv.set_active(True)
-        self.MCh.set_active(True)
+        self.MC.set_active(True)
         self.ax.set_xlim(eclick.xdata, erelease.xdata)
         self.ax.set_ylim(eclick.ydata, erelease.ydata)
         self.get_limits()
@@ -166,8 +180,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             vmin {float} -- min range value
             vmax {float} -- max range value
         """   
-        self.MCv.set_active(True)
-        self.MCh.set_active(True)
+        self.MC.set_active(True)
         self.ax.set_ylim(vmin, vmax)
         self.get_limits()
         self.SSv.set_active(False)
@@ -179,8 +192,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             hmin {float} -- min range value
             hmax {float} -- max range value
         """   
-        self.MCv.set_active(True)
-        self.MCh.set_active(True)
+        self.MC.set_active(True)
         self.ax.set_xlim(hmin, hmax)
         self.get_limits()
         self.SSh.set_active(False)
@@ -229,6 +241,19 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         
         # Set new data to the curve
         self.ax.lines[-1].set_data(x,y)
+        
+        # Update x and y
+        path = self.ax.lines[-1].get_path()
+        x = path.vertices[:,0]
+        y = path.vertices[:,1]
+        
+        # Color new line
+        if all(x == x[0]) or all(y == y[0]):
+            self.ax.lines[-1].set_color("#969696")
+            self.ax.lines[-1].set_linestyle("dashdot")
+        else:
+            self.ax.lines[-1].set_color("#000000")
+            self.ax.lines[-1].set_linestyle("solid")
         
         # Redraw figure canvas
         self.canvas.draw()        
@@ -307,8 +332,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     
     @QtCore.pyqtSlot()
     def on_pushButtonRect_clicked(self):
-        self.MCv.set_active(False)
-        self.MCh.set_active(False)
+        self.MC.set_active(False)
         self.SSv.set_active(False)
         self.SSh.set_active(False)        
         self.RS.set_active(True)
@@ -316,8 +340,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     
     @QtCore.pyqtSlot()
     def on_pushButtonHor_clicked(self):
-        self.MCv.set_active(False)
-        self.MCh.set_active(False)
+        self.MC.set_active(False)
         self.RS.set_active(False)
         self.SSv.set_active(False)
         self.SSh.set_active(True)
@@ -325,12 +348,28 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     
     @QtCore.pyqtSlot()
     def on_pushButtonVert_clicked(self):
-        self.MCv.set_active(False)
-        self.MCh.set_active(False)
+        self.MC.set_active(False)
         self.RS.set_active(False)
         self.SSh.set_active(False)
         self.SSv.set_active(True)
         self.canvas.draw()
+    
+    @QtCore.pyqtSlot()    
+    def on_pushButtonPlayMovie_clicked(self):
+        path = self.ax.lines[-1].get_path()
+        x = path.vertices[:,0]
+        y = path.vertices[:,1]
+        self.ax.lines[-1].set_data([],[])
+        start_loop = time()
+        intervals = []
+        for i in range(len(x)):
+            self.ax.lines[-1].set_data(x[0:i+1],y[0:i+1])
+            self.canvas.start_event_loop(1-(time()-start_loop))
+            intervals.append("Step "+str(i)+": "+str(time()-start_loop))
+            print(intervals[-1])
+            start_loop = time()
+            self.canvas.draw()
+        print(array(intervals))
 
 # endregion
 
