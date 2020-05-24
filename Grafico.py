@@ -15,8 +15,7 @@ from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.widgets import RectangleSelector, SpanSelector, MultiCursor
 
-# Import matplotlib and numpy
-import matplotlib.pyplot as plt
+# Import numpy
 from numpy import *
 
 # Import Qt
@@ -26,10 +25,11 @@ from PyQt5.QtWidgets import QApplication, QMainWindow
 # Import Ui
 from Ui_Grafico import Ui_MainWindow
 
-# Configure matplotlib's backend and pyplot's interactive mode
+# Configure matplotlib's backend
 matplotlib.use("Qt5Agg")
-plt.ion()
-
+# matplotlib.rcParams['path.simplify'] = True
+# matplotlib.rcParams['path.simplify_threshold'] = 1.0
+matplotlib.style.use(['fast'])
 # endregion
 
 # %%
@@ -386,6 +386,6 @@ janela.show() #
 # janela.showMaximized()
 # janela.move(600,300)
 # janela.resize(750,500)
+janela.fig.savefig('novoteste.png')
 sys.exit(app.exec_())
-
 # endregion

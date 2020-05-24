@@ -280,7 +280,8 @@ class Ui_MainWindow(object):
         self.lineEditStart.setText(_translate("MainWindow", "0"))
         self.lineEditStart.setPlaceholderText(_translate("MainWindow", "Start point"))
         self.pushButtonPlayMovie.setText(_translate("MainWindow", "Play Movie \n"
-" in last plot"))
+" in last plot\n"
+"(►)"))
         self.label_2.setText(_translate("MainWindow", "y inf"))
         self.lineEditXsup.setText(_translate("MainWindow", "7"))
         self.lineEditXsup.setPlaceholderText(_translate("MainWindow", "y sup"))

@@ -373,7 +373,8 @@
         </property>
         <property name="text">
          <string>Play Movie 
- in last plot</string>
+ in last plot
+(►)</string>
         </property>
        </widget>
       </item>
