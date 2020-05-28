@@ -101,11 +101,17 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.ax.set_xlabel("x axis")
         self.ax.set_ylabel("y axis")
         
+        # Initiate first current path
+        self.path = []
+        
         # Plot current equation (method already conected to signal 'returnPressed' of 'lineEditEq', defined bellow)
         self.on_lineEditEq_returnPressed()
         
         # Configure home axes limits (method already conected to signal 'clicked' of 'pushButtonHome', defined bellow)
         self.on_pushButtonHome_clicked()
+        
+        self.pushButtonPlayMovie.setText("Play Movie \n in last plot\n(►)")
+        self.running = False
     
     def on_move_mouse(self,event):
         
@@ -240,7 +246,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         
         # Calculate data to plot the curve
         x = linspace(start, stop, num)
-        y = eval(self.lineEditEq.text())
+        
+        try:
+            y = eval(self.lineEditEq.text())
+        except:
+            return None
         
         # Set new data to the curve
         self.ax.lines[-1].set_data(x,y)
@@ -257,6 +267,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         else:
             self.ax.lines[-1].set_color("#000000")
             self.ax.lines[-1].set_linestyle("solid")
+        
+        # Get the last line path
+        self.path = self.ax.lines[-1].get_path()
         
         # Redraw figure canvas
         self.canvas.draw()        
@@ -332,6 +345,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             
             # Decrease number of curves
             self.lines -= 1
+            
+            # Get the last line path
+            self.path = self.ax.lines[-1].get_path()
     
     @QtCore.pyqtSlot()
     def on_pushButtonRect_clicked(self):
@@ -371,20 +387,39 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     
     @QtCore.pyqtSlot()    
     def on_pushButtonPlayMovie_clicked(self):
-        path = self.ax.lines[-1].get_path()
-        x = path.vertices[:,0]
-        y = path.vertices[:,1]
-        self.ax.lines[-1].set_data([],[])
-        start_loop = time()
-        intervals = []
-        for i in range(len(x)):
-            self.ax.lines[-1].set_data(x[0:i+1],y[0:i+1])
-            self.canvas.start_event_loop(max([Dt-(time()-start_loop),1e-30]))
-            intervals.append("Step "+str(i)+": "+str(time()-start_loop))
-            print(intervals[-1])
+        if not self.running:
+            self.running = True
+            self.pushButtonPlayMovie.setText("Pause Movie \n( ▍▍)")
+            
+            xt = self.path.vertices[:,0] 
+            yt = self.path.vertices[:,1] 
+            if all(self.path.vertices[-1,:] == self.ax.lines[-1].get_path().vertices[-1,:]):
+                self.ax.lines[-1].set_data([],[])
+            
+            temp_path = self.ax.lines[-1].get_path()
+            x = temp_path.vertices[:,0]
+            y = temp_path.vertices[:,1]
             start_loop = time()
-            self.canvas.draw()
-        print(array(intervals))
+            intervals = []
+            
+            i = len(x)
+            while self.running and i<len(self.path.vertices[:,1]):
+                
+                i += 1
+                x = xt[0:i]
+                y = yt[0:i]
+                self.ax.lines[-1].set_data(x,y)
+                
+                self.canvas.start_event_loop(max([Dt-(time()-start_loop),1e-30]))
+                intervals.append("Step "+str(i)+": "+str(time()-start_loop))
+                print(intervals[-1])
+                start_loop = time()
+                self.canvas.draw()
+            self.running = False
+            print(array(intervals))
+            self.pushButtonPlayMovie.setText("Play Movie \n in last plot\n(►)")
+        else:
+            self.running = False
     
     def update_Dt(self):
         global Dt

@@ -227,6 +227,7 @@ class Ui_MainWindow(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.pushButtonPlayMovie.sizePolicy().hasHeightForWidth())
         self.pushButtonPlayMovie.setSizePolicy(sizePolicy)
+        self.pushButtonPlayMovie.setMinimumSize(QtCore.QSize(75, 47))
         self.pushButtonPlayMovie.setObjectName("pushButtonPlayMovie")
         self.gridLayout.addWidget(self.pushButtonPlayMovie, 1, 10, 2, 1)
         self.horizontalLayout = QtWidgets.QHBoxLayout()
@@ -248,7 +249,8 @@ class Ui_MainWindow(object):
         MainWindow.setTabOrder(self.lineEditEq, self.lineEditStart)
         MainWindow.setTabOrder(self.lineEditStart, self.lineEditStop)
         MainWindow.setTabOrder(self.lineEditStop, self.lineEditNum)
-        MainWindow.setTabOrder(self.lineEditNum, self.lineEditYinf)
+        MainWindow.setTabOrder(self.lineEditNum, self.lineEditDeltaT)
+        MainWindow.setTabOrder(self.lineEditDeltaT, self.lineEditYinf)
         MainWindow.setTabOrder(self.lineEditYinf, self.lineEditYsup)
         MainWindow.setTabOrder(self.lineEditYsup, self.lineEditXinf)
         MainWindow.setTabOrder(self.lineEditXinf, self.lineEditXsup)
@@ -301,8 +303,8 @@ class Ui_MainWindow(object):
         self.label.setText(_translate("MainWindow", "Equation: f(x)"))
         self.pushButtonPlayMovie.setText(_translate("MainWindow", "Play Movie \n"
 " in last plot\n"
-"(►)"))
-        self.label_9.setText(_translate("MainWindow", "Δt"))
+"( ▍▍)"))
+        self.label_9.setText(_translate("MainWindow", "Δt (s)"))
         self.lineEditDeltaT.setText(_translate("MainWindow", "1.0"))
 
 
