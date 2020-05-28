@@ -30,6 +30,9 @@ matplotlib.use("Qt5Agg")
 # matplotlib.rcParams['path.simplify'] = True
 # matplotlib.rcParams['path.simplify_threshold'] = 1.0
 matplotlib.style.use(['fast'])
+
+Dt = 1.0
+
 # endregion
 
 # %%
@@ -354,6 +357,18 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.SSv.set_active(True)
         self.canvas.draw()
     
+    @QtCore.pyqtSlot()
+    def on_lineEditDeltaT_editingFinished(self):
+        self.update_Dt()
+    
+    @QtCore.pyqtSlot(str)
+    def on_lineEditDeltaT_textChanged(self):
+        self.update_Dt()
+    
+    @QtCore.pyqtSlot()
+    def on_lineEditDeltaT_returnPressed(self):
+        self.update_Dt()
+    
     @QtCore.pyqtSlot()    
     def on_pushButtonPlayMovie_clicked(self):
         path = self.ax.lines[-1].get_path()
@@ -364,12 +379,20 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         intervals = []
         for i in range(len(x)):
             self.ax.lines[-1].set_data(x[0:i+1],y[0:i+1])
-            self.canvas.start_event_loop(1-(time()-start_loop))
+            self.canvas.start_event_loop(max([Dt-(time()-start_loop),1e-30]))
             intervals.append("Step "+str(i)+": "+str(time()-start_loop))
             print(intervals[-1])
             start_loop = time()
             self.canvas.draw()
         print(array(intervals))
+    
+    def update_Dt(self):
+        global Dt
+        try:
+            Dt = max([float(self.lineEditDeltaT.text()),1e-30])
+        except:
+            Dt = 1.0
+        print("Δt = ",Dt)
 
 # endregion
 
@@ -388,4 +411,5 @@ janela.show() #
 # janela.resize(750,500)
 janela.fig.savefig('novoteste.png')
 sys.exit(app.exec_())
+
 # endregion
