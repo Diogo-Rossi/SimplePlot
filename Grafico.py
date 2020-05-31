@@ -174,7 +174,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             erelease {matplotlib.backend_bases.MouseEvent} -- matplotlib event at release mouse button
             https://matplotlib.org/api/backend_bases_api.html?highlight=matplotlib%20backend_bases%20mouseevent#matplotlib.backend_bases.MouseEvent
         """
-        self.MC.set_active(True)
+        self.MC.set_active(True) # Está em primeiro porque reseta os limites do eixo. Se estivesse depois, as linhas abaixo seriam sobrepostas
         self.ax.set_xlim(eclick.xdata, erelease.xdata)
         self.ax.set_ylim(eclick.ydata, erelease.ydata)
         self.get_limits()
