@@ -116,7 +116,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def on_move_mouse(self,event):
         
         # Clears terminal
-        clc()
+        # clc()
         
         if event.inaxes:
             # Print coordinates to mouse position
@@ -179,6 +179,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.ax.set_ylim(eclick.ydata, erelease.ydata)
         self.get_limits()
         self.canvas.draw()
+        print("")
         self.RS.set_active(False)
     
     # Functions to be called when "zoom" vertical and horizontal directions
