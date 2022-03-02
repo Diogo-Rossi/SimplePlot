@@ -3,7 +3,8 @@
 
 # Time import
 from time import time
-
+from time import sleep
+import matplotlib.pyplot as plt
 # Import System tools
 import sys, os, pdb
 def clc(): os.system("cls")
@@ -29,7 +30,7 @@ from Ui_Grafico import Ui_MainWindow
 matplotlib.use("Qt5Agg")
 # matplotlib.rcParams['path.simplify'] = True
 # matplotlib.rcParams['path.simplify_threshold'] = 1.0
-matplotlib.style.use(['fast'])
+# matplotlib.style.use(['fast'])
 
 Dt = 1.0
 
@@ -410,8 +411,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 x = xt[0:i]
                 y = yt[0:i]
                 self.ax.lines[-1].set_data(x,y)
-                
-                self.canvas.start_event_loop(max([Dt-(time()-start_loop),1e-30]))
+                sleep(1)
+                self.canvas.start_event_loop(1)#max([Dt-(time()-start_loop),1e-30]))
+                # sleep(max([Dt-(time()-start_loop),1e-30])) # --> nao funciona
+                # plt.pause(max([Dt-(time()-start_loop),1e-30])) # --> nao funciona
                 intervals.append("Step "+str(i)+": "+str(time()-start_loop))
                 print(intervals[-1])
                 start_loop = time()
